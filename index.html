@@ -151,6 +151,14 @@
       ctx.strokeStyle = document.querySelector('#color').value;
       ctx.lineWidth = document.querySelector('#lineWidth').value;
     }
+    
+    document.addEventListener('touchmove', function(event) {
+    // Check if the user is scrolling from top to bottom
+      if (event.touches[0].clientY < 50) {
+        // Prevent the default "pull to refresh" behavior
+        event.preventDefault();
+      }
+    }, { passive: false });
   </script>
 </body>
 </html>
