@@ -152,10 +152,22 @@
       ctx.lineWidth = document.querySelector('#lineWidth').value;
     }
     
+    var startY, startTopScroll;
+
+    document.addEventListener('touchstart', function(event) {
+      startY = event.touches[0].clientY;
+      startTopScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (startTopScroll === 0) {
+        event.preventDefault();
+      }
+    }, { passive: false });
+
     document.addEventListener('touchmove', function(event) {
-    // Check if the user is scrolling from top to bottom
-      if (event.touches[0].clientY < 50) {
-        // Prevent the default "pull to refresh" behavior
+      var currentY = event.touches[0].clientY;
+      var currentTopScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+      if (currentTopScroll === 0 && currentY > startY) {
         event.preventDefault();
       }
     }, { passive: false });
