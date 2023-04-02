@@ -166,8 +166,16 @@
     document.addEventListener('touchmove', function(event) {
       var currentY = event.touches[0].clientY;
       var currentTopScroll = window.pageYOffset || document.documentElement.scrollTop;
+      var scrollHeight = Math.max(
+        document.body.scrollHeight, document.documentElement.scrollHeight,
+        document.body.offsetHeight, document.documentElement.offsetHeight,
+        document.body.clientHeight, document.documentElement.clientHeight
+      );
 
-      if (currentTopScroll === 0 && currentY > startY) {
+      if (currentTopScroll <= 0 && currentY > startY) {
+        event.preventDefault();
+      }
+      else if (currentTopScroll + window.innerHeight >= scrollHeight && currentY < startY) {
         event.preventDefault();
       }
     }, { passive: false });
