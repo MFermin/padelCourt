@@ -6,13 +6,15 @@
   <style>
     canvas {
       border: 1px solid black;
+      top:0;
     }
+
     .fixedElement {
         background-color: #c0c0c0;
         position:fixed;
         top:0;
         width:100%;
-        z-index:-1; /* Hidden, as line styles won't work on mobile */
+        z-index:-1;
     }
   </style>
 </head>
@@ -94,10 +96,17 @@
       redrawCanvas();
     });
 
-    canvas.addEventListener('touchstart', e => {
-      const touch = e.touches[0];
-      const x = touch.pageX - canvas.offsetLeft;
-      const y = touch.pageY - canvas.offsetTop;
+    mousePressed = false;
+    canvas.addEventListener('touchstart', handleStart, false);
+    canvas.addEventListener('mousedown', handleStart, false);
+
+    function handleStart(e) {
+      // Use the appropriate event object based on the event type
+      const event = e.type.startsWith('touch') ? e.touches[0] : e;
+      mousePressed = true;
+
+      const x = event.pageX - canvas.offsetLeft;
+      const y = event.pageY - canvas.offsetTop;
 
       // Check if the user touched one of the images
       for (const image of images) {
@@ -112,28 +121,54 @@
         ctx.beginPath();
         ctx.moveTo(x, y);
       }
-    });
+    }
 
-    canvas.addEventListener('touchmove', e => {
-      const touch = e.touches[0];
-      const x = touch.pageX - canvas.offsetLeft;
-      const y = touch.pageY - canvas.offsetTop;
+    canvas.addEventListener('touchmove', handleMove, false);
+    canvas.addEventListener('mousemove', handleMove, false);
 
-        if (selectedImage) {
-        selectedImage.x = x - selectedImage.width / 2;
-        selectedImage.y = y - selectedImage.height / 2;
-        redrawCanvas();
-      } else {
-        ctx.lineTo(x, y);
-        ctx.strokeStyle = document.querySelector('#color').value;
-        ctx.lineWidth = document.querySelector('#lineWidth').value;
-        ctx.stroke();
+    function handleMove(e) {
+      const event = e.type.startsWith('touch') ? e.touches[0] : e;
+
+      if (e.type.startsWith('touch') && mousePressed)
+      {
+        const x = event.pageX - canvas.offsetLeft;
+        const y = event.pageY - canvas.offsetTop;
+          if (selectedImage) {
+          selectedImage.x = x - selectedImage.width / 2;
+          selectedImage.y = y - selectedImage.height / 2;
+          redrawCanvas();
+        } else {
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = document.querySelector('#color').value;
+          ctx.lineWidth = document.querySelector('#lineWidth').value;
+          ctx.stroke();
+        }
       }
-    });
 
-    canvas.addEventListener('touchend', () => {
+      if (e.type.startsWith('mouse') && mousePressed)
+      {
+        const x = event.pageX - canvas.offsetLeft;
+        const y = event.pageY - canvas.offsetTop;
+          if (selectedImage) {
+          selectedImage.x = x - selectedImage.width / 2;
+          selectedImage.y = y - selectedImage.height / 2;
+          redrawCanvas();
+        } else {
+          ctx.lineTo(x, y);
+          ctx.strokeStyle = document.querySelector('#color').value;
+          ctx.lineWidth = document.querySelector('#lineWidth').value;
+          ctx.stroke();
+        }
+      }
+    };
+
+    canvas.addEventListener('touchend', handleEnd, false);
+    canvas.addEventListener('mouseup', handleEnd, false);
+
+    function handleEnd(e) {
       selectedImage = null;
-    });
+      mousePressed = false;
+    };
 
     document.querySelector('#color').addEventListener('input', () => {
       redrawCanvas();
